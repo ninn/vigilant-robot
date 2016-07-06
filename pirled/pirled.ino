@@ -1,3 +1,6 @@
+
+
+
 /* 
  * //////////////////////////////////////////////////
  * //making sense of the Parallax PIR sensor's output
