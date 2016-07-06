@@ -65,6 +65,11 @@ int green[3]  = { 0, 100, 0 };
 int blue[3]   = { 0, 0, 100 };
 int yellow[3] = { 40, 95, 0 };
 int dimWhite[3] = { 30, 30, 30 };
+
+int dimred[3]   = { 20, 0, 0 };
+int dimyellow[3] = { 40, 30, 0 };
+int dimWhite[3] = { 50, 50, 50 };
+
 // etc.
 
 // Set initial color
@@ -153,6 +158,11 @@ void setup(){
 //LOOP
 void loop(){
 
+
+
+
+  
+
      if(digitalRead(pirPin) == HIGH){
        digitalWrite(ledPin, HIGH);   //the led visualizes the sensors output pin state
        if(lockLow){  
@@ -163,7 +173,7 @@ void loop(){
          Serial.print(millis()/1000);
          Serial.println(" sec"); 
 
-
+         // farbe auf dimwhite
          
          delay(50);
          }         
@@ -188,7 +198,7 @@ void loop(){
            Serial.println(" sec");
 
 
-
+          // farbe auf black
            
            delay(50);
            }
@@ -328,4 +338,52 @@ void crossFade(int color[3]) {
   prevB = bluVal;
   delay(hold); // Pause for optional 'wait' milliseconds before resuming the loop
 }
-  
+
+
+  /* crossFade() converts the percentage colors to a 
+*  0-255 range, then loops 1020 times, checking to see if  
+*  the value needs to be updated each time, then writing
+*  the color values to the correct pins.
+*/
+
+void crossFade_noloop(int color[3]) {
+  // Convert to 0-255
+  int R = (color[0] * 255) / 100;
+  int G = (color[1] * 255) / 100;
+  int B = (color[2] * 255) / 100;
+
+  int stepR = calculateStep(prevR, R);
+  int stepG = calculateStep(prevG, G); 
+  int stepB = calculateStep(prevB, B);
+
+  for (int i = 0; i <= 1020; i++) {
+    redVal = calculateVal(stepR, redVal, i);
+    grnVal = calculateVal(stepG, grnVal, i);
+    bluVal = calculateVal(stepB, bluVal, i);
+
+    analogWrite(redPin, redVal);   // Write current values to LED pins
+    analogWrite(grnPin, grnVal);      
+    analogWrite(bluPin, bluVal); 
+
+    delay(wait); // Pause for 'wait' milliseconds before resuming the loop
+
+    if (DEBUG) { // If we want serial output, print it at the 
+      if (i == 0 or i % loopCount == 0) { // beginning, and every loopCount times
+        Serial.print("Loop/RGB: #");
+        Serial.print(i);
+        Serial.print(" | ");
+        Serial.print(redVal);
+        Serial.print(" / ");
+        Serial.print(grnVal);
+        Serial.print(" / ");  
+        Serial.println(bluVal); 
+      } 
+      DEBUG += 1;
+    }
+  }
+  // Update current values for next loop
+  prevR = redVal; 
+  prevG = grnVal; 
+  prevB = bluVal;
+  delay(hold); // Pause for optional 'wait' milliseconds before resuming the loop
+}
