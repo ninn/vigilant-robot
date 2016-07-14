@@ -64,11 +64,11 @@ int red[3]    = { 100, 0, 0 };
 int green[3]  = { 0, 100, 0 };
 int blue[3]   = { 0, 0, 100 };
 int yellow[3] = { 40, 95, 0 };
-int dimWhite[3] = { 30, 30, 30 };
+// int dimWhite[3] = { 30, 30, 30 };
 
 int dimred[3]   = { 20, 0, 0 };
-int dimyellow[3] = { 40, 30, 0 };
-int dimWhite[3] = { 50, 50, 50 };
+int dimyellow[3] = { 20, 47, 0 };
+int dimWhite[3] = { 90 , 166 , 89 };
 
 // etc.
 
@@ -119,14 +119,14 @@ int prevB = bluVal;
 /////////////////////////////
 //VARS
 //the time we give the sensor to calibrate (10-60 secs according to the datasheet)
-int calibrationTime = 30;        
+int calibrationTime = 1;        
 
 //the time when the sensor outputs a low impulse
 long unsigned int lowIn;         
 
 //the amount of milliseconds the sensor has to be low 
 //before we assume all motion has stopped
-long unsigned int pause = 5000;  
+long unsigned int pause = 25000;  
 
 boolean lockLow = true;
 boolean takeLowTime;  
@@ -139,6 +139,14 @@ int ledPin = 13;
 //SETUP
 void setup(){
   Serial.begin(9600);
+ 
+    pinMode(redPin, OUTPUT);   // sets the pins as output
+  pinMode(grnPin, OUTPUT);   
+  pinMode(bluPin, OUTPUT); 
+
+
+  
+  
   pinMode(pirPin, INPUT);
   pinMode(ledPin, OUTPUT);
   digitalWrite(pirPin, LOW);
@@ -160,9 +168,12 @@ void loop(){
 
 
 
-
+  /*crossFade(yellow);
+  crossFade(green);
+  crossFade(blue);
+  crossFade(yellow);
   
-
+*/
      if(digitalRead(pirPin) == HIGH){
        digitalWrite(ledPin, HIGH);   //the led visualizes the sensors output pin state
        if(lockLow){  
@@ -174,7 +185,11 @@ void loop(){
          Serial.println(" sec"); 
 
          // farbe auf dimwhite
-         
+  crossFade(white);
+  //crossFade(green);
+  //crossFade(blue);
+  //crossFade(yellow);
+       
          delay(50);
          }         
          takeLowTime = true;
@@ -197,6 +212,10 @@ void loop(){
            Serial.print((millis() - pause)/1000);
            Serial.println(" sec");
 
+crossFade(black);
+//  crossFade(green);
+//  crossFade(blue);
+//  crossFade(yellow);
 
           // farbe auf black
            
