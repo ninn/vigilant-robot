@@ -68,7 +68,14 @@ int yellow[3] = { 40, 95, 0 };
 
 int dimred[3]   = { 20, 0, 0 };
 int dimyellow[3] = { 20, 47, 0 };
-int dimWhite[3] = { 90 , 166 , 89 };
+int yellowjello[3] = { 50 , 40 , 0 };
+int dimsugarWhite[3] = {16,15,14};
+int palemoon[3] = {20,15,14};
+
+
+int dimWhite[3] = {20,15,14};
+
+
 
 // etc.
 
@@ -77,10 +84,10 @@ int redVal = black[0];
 int grnVal = black[1]; 
 int bluVal = black[2];
 
-int wait = 10;      // 10ms internal crossFade delay; increase for slower fades
+int wait = 0;      // 10ms internal crossFade delay; increase for slower fades
 int hold = 0;       // Optional hold when a color is complete, before the next crossFade
 int DEBUG = 1;      // DEBUG counter; if set to 1, will write values back via serial
-int loopCount = 60; // How often should DEBUG report?
+int loopCount = 255; // How often should DEBUG report?
 int j = 0;          // Loop counter for repeat
 
 // Initialize color variables
@@ -88,6 +95,7 @@ int prevR = redVal;
 int prevG = grnVal;
 int prevB = bluVal;
 
+int iNoLoop = 0;
 
 /* 
  * //////////////////////////////////////////////////
@@ -126,7 +134,7 @@ long unsigned int lowIn;
 
 //the amount of milliseconds the sensor has to be low 
 //before we assume all motion has stopped
-long unsigned int pause = 25000;  
+long unsigned int pause = 50;  
 
 boolean lockLow = true;
 boolean takeLowTime;  
@@ -185,7 +193,7 @@ void loop(){
          Serial.println(" sec"); 
 
          // farbe auf dimwhite
-  crossFade(white);
+  crossFade(dimWhite);
   //crossFade(green);
   //crossFade(blue);
   //crossFade(yellow);
@@ -375,10 +383,11 @@ void crossFade_noloop(int color[3]) {
   int stepG = calculateStep(prevG, G); 
   int stepB = calculateStep(prevB, B);
 
-  for (int i = 0; i <= 1020; i++) {
-    redVal = calculateVal(stepR, redVal, i);
-    grnVal = calculateVal(stepG, grnVal, i);
-    bluVal = calculateVal(stepB, bluVal, i);
+  if (iNoLoop <= 1020) { 
+    iNoLoop++;
+    redVal = calculateVal(stepR, redVal, iNoLoop);
+    grnVal = calculateVal(stepG, grnVal, iNoLoop);
+    bluVal = calculateVal(stepB, bluVal, iNoLoop);
 
     analogWrite(redPin, redVal);   // Write current values to LED pins
     analogWrite(grnPin, grnVal);      
@@ -387,14 +396,14 @@ void crossFade_noloop(int color[3]) {
     delay(wait); // Pause for 'wait' milliseconds before resuming the loop
 
     if (DEBUG) { // If we want serial output, print it at the 
-      if (i == 0 or i % loopCount == 0) { // beginning, and every loopCount times
+      if (iNoLoop == 0 or iNoLoop % loopCount == 0) { // beginning, and every loopCount times
         Serial.print("Loop/RGB: #");
-        Serial.print(i);
+        Serial.print(iNoLoop);
         Serial.print(" | ");
         Serial.print(redVal);
-        Serial.print(" / ");
+        Serial.print(", ");
         Serial.print(grnVal);
-        Serial.print(" / ");  
+        Serial.print(", ");  
         Serial.println(bluVal); 
       } 
       DEBUG += 1;
