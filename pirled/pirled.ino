@@ -71,7 +71,7 @@ int dimyellow[3] = { 20, 47, 0 };
 int yellowjello[3] = { 50 , 40 , 0 };
 int dimsugarWhite[3] = {16,15,14};
 int palemoon[3] = {20,15,14};
-
+int sleepyellow[3] = {20,15,0};
 
 int dimWhite[3] = {20,15,14};
 
@@ -84,10 +84,10 @@ int redVal = black[0];
 int grnVal = black[1]; 
 int bluVal = black[2];
 
-int wait = 0;      // 10ms internal crossFade delay; increase for slower fades
+int wait = 10;      // 10ms internal crossFade delay; increase for slower fades
 int hold = 0;       // Optional hold when a color is complete, before the next crossFade
 int DEBUG = 1;      // DEBUG counter; if set to 1, will write values back via serial
-int loopCount = 255; // How often should DEBUG report?
+int loopCount = 510; // How often should DEBUG report?
 int j = 0;          // Loop counter for repeat
 
 // Initialize color variables
@@ -127,17 +127,23 @@ int iNoLoop = 0;
 /////////////////////////////
 //VARS
 //the time we give the sensor to calibrate (10-60 secs according to the datasheet)
-int calibrationTime = 1;        
+int calibrationTime = 5;        
 
 //the time when the sensor outputs a low impulse
 long unsigned int lowIn;         
+long unsigned int ticklowIn;  
 
 //the amount of milliseconds the sensor has to be low 
 //before we assume all motion has stopped
-long unsigned int pause = 50;  
+long unsigned int pause = 30000;  
+long unsigned int tickpause = 120000;  
 
 boolean lockLow = true;
 boolean takeLowTime;  
+
+boolean tickLow = true;
+boolean tickLowTime; 
+
 
 int pirPin = 3;    //the digital pin connected to the PIR sensor's output
 int ledPin = 13;
@@ -148,15 +154,13 @@ int ledPin = 13;
 void setup(){
   Serial.begin(9600);
  
-    pinMode(redPin, OUTPUT);   // sets the pins as output
+  pinMode(redPin, OUTPUT);   // sets the pins as output
   pinMode(grnPin, OUTPUT);   
   pinMode(bluPin, OUTPUT); 
-
-
-  
   
   pinMode(pirPin, INPUT);
   pinMode(ledPin, OUTPUT);
+  
   digitalWrite(pirPin, LOW);
 
   //give the sensor some time to calibrate
@@ -186,14 +190,18 @@ void loop(){
        digitalWrite(ledPin, HIGH);   //the led visualizes the sensors output pin state
        if(lockLow){  
          //makes sure we wait for a transition to LOW before any further output is made:
-         lockLow = false;            
+         lockLow = false;    
+         tickLow = false;        
+
          Serial.println("---");
          Serial.print("motion detected at ");
          Serial.print(millis()/1000);
          Serial.println(" sec"); 
 
+          int randWhite[3] = {10+random(10),7+random(7),7+random(7)};
+
          // farbe auf dimwhite
-  crossFade(dimWhite);
+        crossFade(randWhite);
   //crossFade(green);
   //crossFade(blue);
   //crossFade(yellow);
@@ -201,6 +209,7 @@ void loop(){
          delay(50);
          }         
          takeLowTime = true;
+         tickLowTime = true;
        }
 
      if(digitalRead(pirPin) == LOW){       
@@ -219,14 +228,32 @@ void loop(){
            Serial.print("motion ended at ");      //output
            Serial.print((millis() - pause)/1000);
            Serial.println(" sec");
+           
+             
+          int randsleepyellow[3] = {10+random(10),7+random(7),0};
 
-crossFade(black);
-//  crossFade(green);
-//  crossFade(blue);
-//  crossFade(yellow);
-
+             crossFade(randsleepyellow);
           // farbe auf black
            
+           delay(50);
+           }
+       
+
+       if(tickLowTime){
+        ticklowIn = millis();          //save the time of the transition from high to LOW
+        tickLowTime = false;       //make sure this is only done at the start of a LOW phase
+        }
+        
+      if(!tickLow && millis() - ticklowIn > tickpause){  
+           //makes sure this block of code is only executed again after 
+
+           //a new motion sequence has been detected
+           tickLow = true;                        
+           Serial.print("second motion ended at ");      //output
+           Serial.print((millis() - tickpause)/1000);
+           Serial.println(" sec");
+           crossFade(black);
+           // farbe auf mittelgelb
            delay(50);
            }
        }
@@ -245,15 +272,6 @@ void setup_cf()
   }
 }
 
-// Main program: list the order of crossfades
-void loop_cf()
-{
-  crossFade(red);
-  crossFade(green);
-  crossFade(blue);
-  crossFade(yellow);
-
-}
 
 /* BELOW THIS LINE IS THE MATH -- YOU SHOULDN'T NEED TO CHANGE THIS FOR THE BASICS
 * 
@@ -408,6 +426,9 @@ void crossFade_noloop(int color[3]) {
       } 
       DEBUG += 1;
     }
+  } else {
+    
+  iNoLoop = 0;  
   }
   // Update current values for next loop
   prevR = redVal; 
