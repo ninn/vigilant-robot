@@ -127,7 +127,7 @@ int iNoLoop = 0;
 /////////////////////////////
 //VARS
 //the time we give the sensor to calibrate (10-60 secs according to the datasheet)
-int calibrationTime = 5;        
+int calibrationTime = 15;        
 
 //the time when the sensor outputs a low impulse
 long unsigned int lowIn;         
@@ -135,7 +135,7 @@ long unsigned int ticklowIn;
 
 //the amount of milliseconds the sensor has to be low 
 //before we assume all motion has stopped
-long unsigned int pause = 30000;  
+long unsigned int pause = 60000;  
 long unsigned int tickpause = 120000;  
 
 boolean lockLow = true;
@@ -198,7 +198,7 @@ void loop(){
          Serial.print(millis()/1000);
          Serial.println(" sec"); 
 
-          int randWhite[3] = {10+random(10),7+random(7),7+random(7)};
+          int randWhite[3] = {20+int(random(-10,10)),15+int(random(-7,7)),15+int(random(-7,7))};
 
          // farbe auf dimwhite
         crossFade(randWhite);
@@ -230,7 +230,7 @@ void loop(){
            Serial.println(" sec");
            
              
-          int randsleepyellow[3] = {10+random(10),7+random(7),0};
+          int randsleepyellow[3] = {10+int(random(10)),7+int(random(7)),0};
 
              crossFade(randsleepyellow);
           // farbe auf black
