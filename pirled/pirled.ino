@@ -198,13 +198,11 @@ void loop(){
          Serial.print(millis()/1000);
          Serial.println(" sec"); 
 
-          int randWhite[3] = {20+int(random(-10,10)),15+int(random(-7,7)),15+int(random(-7,7))};
-
-         // farbe auf dimwhite
-        crossFade(randWhite);
-  //crossFade(green);
-  //crossFade(blue);
-  //crossFade(yellow);
+          if ( millis() % 8640000 < 2880000) {
+             // farbe auf dimwhite
+             int randWhite[3] = {20+int(random(-10,10)),15+int(random(-7,7)),15+int(random(-7,7))};
+             crossFade(randWhite);
+          }
        
          delay(50);
          }         
@@ -228,12 +226,12 @@ void loop(){
            Serial.print("motion ended at ");      //output
            Serial.print((millis() - pause)/1000);
            Serial.println(" sec");
-           
-             
-          int randsleepyellow[3] = {10+int(random(10)),7+int(random(7)),0};
 
+           if ( millis() % 8640000 < 2880000) {
+           // farbe auf Sleepy yellow
+             int randsleepyellow[3] = {10+int(random(10)),7+int(random(7)),0};
              crossFade(randsleepyellow);
-          // farbe auf black
+           }
            
            delay(50);
            }
@@ -252,8 +250,10 @@ void loop(){
            Serial.print("second motion ended at ");      //output
            Serial.print((millis() - tickpause)/1000);
            Serial.println(" sec");
+           
+           // farbe auf schwarz, ausschalten
            crossFade(black);
-           // farbe auf mittelgelb
+           
            delay(50);
            }
        }
